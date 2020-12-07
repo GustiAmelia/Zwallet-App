@@ -1,0 +1,15 @@
+export const colors = {
+  primary : '#6379f4',
+  dark : '#3A3D42' ,
+  white : '#FFFFFF',
+  error : '#FF5B37' ,
+  secondry : 'rgba(99, 121, 244, 0.2)',
+  background : '#fafcff' ,
+  subTitle : '#7a7886',
+  btn : '#dadada',
+  success : '#1ec15f',
+  bgImge : '#ebeef2',
+  trans : '#e5e8ed',
+  textDescription:'rgba(58, 61, 66, 0.6)',
+  grey:'#88888F',
+};
