@@ -5,7 +5,7 @@ import {Formik} from 'formik';
 import * as yup from 'yup';
 import {IconButton} from 'react-native-paper';
 
-const Login = () => {
+const SignUp = () => {
 
   const schema = yup.object({
     email:yup.string().required().email(),
@@ -28,18 +28,31 @@ const Login = () => {
           <View style={styles.footer}>
             <Formik
               initialValues={{
+                username:'',
                 email:'',
                 password:'',
               }}
               onSubmit={(values,actions)=>{
                 actions.resetForm();
+                console.log(values)
               }}
               validationSchema={schema}
             >
             {(props)=>(
               <ScrollView style={styles.footerContent}>
-                <Text style={styles.titleFooter}>Login</Text>
-                <Text style={styles.textFooter}>Login to your existing account to access all the features in Zwallet.</Text>
+                <Text style={styles.titleFooter}>Sign Up</Text>
+                <Text style={styles.textFooter}>Create your account to access Zwallet.</Text>
+                <View style={props.values.username ? styles.textWrapperFilled : styles.textWrapperBlank}>
+                  <IconButton icon="account-outline" color={props.values.username ? colors.primary : colors.textDescription}/>
+                  <TextInput
+                    style={styles.textForm}
+                    placeholder="Enter your username"
+                    onChangeText={props.handleChange('username')}
+                    value={props.values.username}
+                    onBlur={props.handleBlur('username')}
+                  />
+                </View>
+                <Text style={styles.isValidInput}>{props.touched.email && props.errors.email}</Text>
                 <View style={props.values.email ? styles.textWrapperFilled : styles.textWrapperBlank}>
                   <IconButton icon="email-outline" color={props.values.email ? colors.primary : colors.textDescription}/>
                   <TextInput
@@ -73,17 +86,14 @@ const Login = () => {
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.isValidInput}>{props.touched.password && props.errors.password}</Text>
-                <TouchableOpacity>
-                  <Text style={styles.textForgot}>Forgot password?</Text>
-                </TouchableOpacity>
                 <View style={styles.buttonWrapper}>
                   <TouchableOpacity onPress={props.handleSubmit} disabled={!props.values.email || !props.values.password} style={!props.values.email || !props.values.password ? styles.buttonBlank : styles.buttonFilled}>
-                    <Text style={!props.values.email || !props.values.password ? styles.textButtonBlank : styles.textButtonFilled}>Login</Text>
+                    <Text style={!props.values.email || !props.values.password ? styles.textButtonBlank : styles.textButtonFilled}>Sign Up</Text>
                   </TouchableOpacity>
                   <View style={styles.questions}>
-                    <Text style={styles.textQuestions}>Don’t have an account? Let’s </Text>
+                    <Text style={styles.textQuestions}>Already have an account? Let’s </Text>
                     <TouchableOpacity>
-                      <Text style={styles.link}>Sign Up</Text>
+                      <Text style={styles.link}>Login</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -97,7 +107,7 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
 
 const styles = StyleSheet.create({
   container:{
@@ -203,13 +213,6 @@ const styles = StyleSheet.create({
     color:colors.grey,
     fontWeight:'bold',
   },
-  textForgot:{
-    color:colors.dark,
-    fontSize:14,
-    lineHeight:24,
-    textAlign:'right',
-    marginTop:10,
-  },
   isValidInput :{
     color:colors.error,
     marginTop:5,
@@ -217,7 +220,7 @@ const styles = StyleSheet.create({
   questions:{
     flexDirection:'row',
     justifyContent:'center',
-    marginTop:25,
+    marginTop:20,
   },
   textQuestions:{
     color:colors.grey,
