@@ -1,10 +1,24 @@
 import React, {useState} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import { View, Text, StyleSheet, StatusBar,TouchableOpacity, ScrollView, Image } from 'react-native';
 import {colors} from '../components/colors';
 import Card from '../components/Card';
 import {IconButton} from 'react-native-paper';
+import {getUserCreator} from '../redux/actions/user';
 
-const Success = () => {
+const Success = ({route,navigation}) => {
+
+  const authData = useSelector((state)=>state.auth.data);
+  const user = useSelector((state)=>state.user.user.filter((item)=>{return item.id === authData.id;}));
+  const {item} = route.params;
+  let {form} = route.params;
+
+  const dispatch = useDispatch();
+
+  const buttonBackToHome = ()=>{
+    dispatch(getUserCreator());
+    navigation.navigate('Home');
+  };
 
   return (
     <>
@@ -20,45 +34,47 @@ const Success = () => {
             <View style={styles.cardWrapper}>
               <Card style={styles.infomationCard}>
                 <Text style={styles.titleInfo}>Amount</Text>
-                <Text style={styles.info}>Rp.100.000,00</Text>
+                <Text style={styles.info}>{Number(form.amount).toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
               </Card>
               <Card style={styles.infomationCard}>
                 <Text style={styles.titleInfo}>Balance Left</Text>
-                <Text style={styles.info}>Rp.100.000,00</Text>
+                <Text style={styles.info}>{(user[0].balance - Number(form.amount)).toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
               </Card>
             </View>
             <View style={styles.cardWrapper}>
               <Card style={styles.infomationCard}>
                 <Text style={styles.titleInfo}>Date</Text>
-                <Text style={styles.info}>May 11, 2020</Text>
+                <Text style={styles.info}>{form.date}</Text>
               </Card>
               <Card style={styles.infomationCard}>
                 <Text style={styles.titleInfo}>Time</Text>
-                <Text style={styles.info}>12.20</Text>
+                <Text style={styles.info}>{form.time}</Text>
               </Card>
             </View>
             <Card style={styles.cardNote}>
               <Text style={styles.titleInfo}>Notes</Text>
-              <Text style={styles.info}>For buying some socks</Text>
+              <Text style={styles.info}>{form.note}</Text>
             </Card>
             <Text style={styles.text}>From</Text>
             <Card style={styles.cardContact}>
               <Image source={require('../../assets/images/suga.jpg')} style={styles.image}/>
               <View style={styles.textContent}>
-                <Text style={styles.textName}>Jungkook</Text>
-                <Text style={styles.phone}>097545793</Text>
+                <Text style={styles.textName}>{user[0].username}</Text>
+                <Text style={styles.phone}>{user[0].phone}</Text>
               </View>
             </Card>
             <Text style={styles.text}>To</Text>
             <Card style={styles.cardContact}>
               <Image source={require('../../assets/images/suga.jpg')} style={styles.image}/>
               <View style={styles.textContent}>
-                <Text style={styles.textName}>Jungkook</Text>
-                <Text style={styles.phone}>097545793</Text>
+                <Text style={styles.textName}>{item.username}</Text>
+                <Text style={styles.phone}>{item.phone}</Text>
               </View>
             </Card>
             <View style={styles.buttonWrapper}>
-              <TouchableOpacity  style={false ? styles.buttonBlank : styles.buttonFilled}>
+              <TouchableOpacity
+              onPress={buttonBackToHome}
+               style={false ? styles.buttonBlank : styles.buttonFilled}>
                 <Text style={false ? styles.textButtonBlank : styles.textButtonFilled}>Back to Home</Text>
               </TouchableOpacity>
             </View>

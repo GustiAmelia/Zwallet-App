@@ -1,23 +1,21 @@
 import React, {useState} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import { View, Text, StyleSheet, StatusBar, TextInput,TouchableOpacity,FlatList } from 'react-native';
 import {colors} from '../components/colors';
 import Feather from 'react-native-vector-icons/Feather';
 import Contacs from '../components/Contacs';
 
-const Search = () => {
+const Search = ({navigation}) => {
 
-  const data = [
-    {username:'Jungkook', phone:'198658923569'},
-    {username:'Jin', phone:'198658923569'},
-    {username:'namjoon', phone:'198658923569'},
-  ]
+  const authData = useSelector((state)=>state.auth.data);
+  const data = useSelector((state)=>state.user.user);
 
   return (
     <>
       <StatusBar backgroundColor={colors.primary}/>
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.back}>
+          <TouchableOpacity style={styles.back} onPress={()=>navigation.navigate('Home')}>
             <Feather style={styles.iconBack} name="arrow-left" size={30} color="#FFFFFF"/>
             <Text style={styles.text}>Find Receiver</Text>
           </TouchableOpacity>
@@ -33,13 +31,13 @@ const Search = () => {
         <View style={styles.footer}>
           <View style={styles.titleWrapper}>
             <Text style={styles.title}>Contacs</Text>
-              <Text style={styles.description}>6 contacs Found</Text>
+              <Text style={styles.description}>{data.length - 1} contacs Found</Text>
           </View>
           <FlatList
-            data={data}
+            data={data.filter((item)=>{return item.id !== authData.id;})}
             renderItem={({item})=>{
               return (
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>navigation.navigate('InputAmount',{item})}>
                   <Contacs item={item}/>
                 </TouchableOpacity>
               );

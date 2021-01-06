@@ -1,11 +1,20 @@
 import React, {useState, useEffect, useRef} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import { View, Text, StyleSheet, StatusBar, TextInput,TouchableOpacity,TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
 import {colors} from '../components/colors';
 import Feather from 'react-native-vector-icons/Feather';
+import Axios from 'axios';
 
 
-const PinConfirmation = () => {
+const PinConfirmation = ({route,navigation}) => {
 
+  const {item} = route.params;
+  let {form} = route.params;
+
+  const linkAPI = 'http://192.168.1.37:5000/';
+  const authData = useSelector((state)=>state.auth.data);
+  const [pinSuccess, setPinSuccess] = useState(false);
+  const [transferSuccess, setTransferSuccess] = useState(false);
   const [interval, setInterval] = useState('');
   let textInput = useRef(null);
   const lengthInput = 6;
@@ -17,6 +26,31 @@ const PinConfirmation = () => {
   useEffect(()=>{
     textInput.focus();
   },[]);
+
+  const buttonTransfer = ()=>{
+    Axios.post(`${linkAPI}auth/pin`,{
+      email:authData.email,
+      pin:interval,
+    }).then((res) => {
+      setPinSuccess(res.data.isSuccess);
+    }).catch(err => console.log(err));
+  };
+
+  if (pinSuccess){
+    Axios.post(`${linkAPI}transaction`,{
+      category:'Transfer',
+      amount:form.amount,
+      sender_id:authData.id,
+      receiver_id:item.id,
+      note:form.note,
+    }).then((res) => {
+      setTransferSuccess(res.data.isSuccess);
+    }).catch(err => console.log(err));
+  }
+
+  if (transferSuccess){
+    navigation.navigate('Success',{...{item},form});
+  }
 
   return (
     <>
@@ -61,7 +95,9 @@ const PinConfirmation = () => {
                 }
               </View>
               <View style={styles.buttonWrapper}>
-                <TouchableOpacity disabled={interval.length !== 6} style={interval.length !== 6 ? styles.buttonBlank : styles.buttonFilled}>
+                <TouchableOpacity
+                onPress={buttonTransfer}
+                disabled={interval.length !== 6} style={interval.length !== 6 ? styles.buttonBlank : styles.buttonFilled}>
                   <Text style={interval.length !== 6 ? styles.textButtonBlank : styles.textButtonFilled}>Transfer Now</Text>
                 </TouchableOpacity>
               </View>

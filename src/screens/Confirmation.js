@@ -1,18 +1,31 @@
 import React, {useState} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import { View, Text, StyleSheet, StatusBar, TextInput,TouchableOpacity,TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
 import {colors} from '../components/colors';
 import Feather from 'react-native-vector-icons/Feather';
 import Card from '../components/Card';
-import {IconButton} from 'react-native-paper';
+import moment from 'moment';
 
-const Confirmation = () => {
+const Confirmation = ({route,navigation}) => {
+
+  const authData = useSelector((state)=>state.auth.data);
+  const user = useSelector((state)=>state.user.user.filter((item)=>{return item.id === authData.id;}));
+  const {item} = route.params;
+  let {form} = route.params;
+  const date = moment(new Date()).format('MMMM D,YYYY');
+  const time = moment(new Date()).format('HH:mm');
+  form = {...form,date,time};
+
+  const handleContinue = ()=>{
+    navigation.navigate('PinConfirmation',{...{item},form});
+  };
 
   return (
     <>
       <StatusBar backgroundColor={colors.primary}/>
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.back}>
+          <TouchableOpacity style={styles.back} onPress={()=>navigation.navigate('InputAmount')}>
             <Feather style={styles.iconBack} name="arrow-left" size={30} color="#FFFFFF"/>
             <Text style={styles.text}>Confirmation</Text>
           </TouchableOpacity>
@@ -23,8 +36,8 @@ const Confirmation = () => {
               name="user" size={40} color="#6379F4"
               />
               <View style={styles.textContent}>
-                <Text style={styles.textName}>jungkook</Text>
-                <Text style={styles.phone}>39845398</Text>
+                <Text style={styles.textName}>{item.username}</Text>
+                <Text style={styles.phone}>{item.phone}</Text>
               </View>
             </View>
           </Card>
@@ -34,29 +47,31 @@ const Confirmation = () => {
             <View style={styles.cardWrapper}>
               <Card style={styles.infomationCard}>
                 <Text style={styles.titleInfo}>Amount</Text>
-                <Text style={styles.info}>Rp.100.000,00</Text>
+                <Text style={styles.info}>{Number(form.amount).toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
               </Card>
               <Card style={styles.infomationCard}>
                 <Text style={styles.titleInfo}>Balance Left</Text>
-                <Text style={styles.info}>Rp.100.000,00</Text>
+                <Text style={styles.info}>{(user[0].balance - Number(form.amount)).toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
               </Card>
             </View>
             <View style={styles.cardWrapper}>
               <Card style={styles.infomationCard}>
                 <Text style={styles.titleInfo}>Date</Text>
-                <Text style={styles.info}>May 11, 2020</Text>
+                <Text style={styles.info}>{date}</Text>
               </Card>
               <Card style={styles.infomationCard}>
                 <Text style={styles.titleInfo}>Time</Text>
-                <Text style={styles.info}>12.20</Text>
+                <Text style={styles.info}>{time}</Text>
               </Card>
             </View>
             <Card style={styles.cardNote}>
               <Text style={styles.titleInfo}>Notes</Text>
-              <Text style={styles.info}>For buying some socks</Text>
+              <Text style={styles.info}>{form.note}</Text>
             </Card>
             <View style={styles.buttonWrapper}>
-              <TouchableOpacity  style={false ? styles.buttonBlank : styles.buttonFilled}>
+              <TouchableOpacity
+              onPress={handleContinue}
+              style={false ? styles.buttonBlank : styles.buttonFilled}>
                 <Text style={false ? styles.textButtonBlank : styles.textButtonFilled}>Continue</Text>
               </TouchableOpacity>
             </View>
@@ -154,13 +169,13 @@ const styles = StyleSheet.create({
     marginVertical:10,
   },
   titleInfo:{
-    fontSize:16,
+    fontSize:15,
     lineHeight:22,
     color:'#7A7886',
     marginBottom:10,
   },
   info:{
-    fontSize:18,
+    fontSize:17,
     lineHeight:25,
     color:'#514F5B',
     fontWeight:'bold',

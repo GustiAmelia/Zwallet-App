@@ -1,8 +1,14 @@
 import React, {useState, useEffect, useRef} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import { View, Text, StyleSheet, StatusBar, TextInput,TouchableOpacity,TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
 import {colors} from '../components/colors';
+import Axios from 'axios';
 
-const CreatePin = () => {
+const CreatePin = ({navigation}) => {
+
+  const linkAPI = 'http://192.168.1.37:5000/';
+  const email = useSelector((state)=>state.auth.data.email);
+  const [pinSuccess, setPinSuccess] = useState(false);
 
   const [interval, setInterval] = useState('');
   let textInput = useRef(null);
@@ -15,6 +21,21 @@ const CreatePin = () => {
   useEffect(()=>{
     textInput.focus();
   },[]);
+
+  const buttonConfrim = ()=>{
+    Axios.patch(`${linkAPI}user/updatePin`,{
+      email,
+      pin:interval,
+    }).then((res) => {
+      setPinSuccess(res.data.isSuccess);
+    }).catch(err => console.log(err));
+  };
+
+  useEffect(()=>{
+    if (pinSuccess){
+      navigation.navigate('PinSuccess');
+    }
+  },[pinSuccess]);
 
   return (
     <>
@@ -56,7 +77,11 @@ const CreatePin = () => {
                 }
               </View>
               <View style={styles.buttonWrapper}>
-                <TouchableOpacity disabled={interval.length !== 6} style={interval.length !== 6 ? styles.buttonBlank : styles.buttonFilled}>
+                <TouchableOpacity
+                  disabled={interval.length !== 6}
+                  style={interval.length !== 6 ? styles.buttonBlank : styles.buttonFilled}
+                  onPress={buttonConfrim}
+                  >
                   <Text style={interval.length !== 6 ? styles.textButtonBlank : styles.textButtonFilled}>Confirm</Text>
                 </TouchableOpacity>
               </View>

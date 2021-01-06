@@ -4,15 +4,22 @@ import Feather from 'react-native-vector-icons/Feather';
 import Card from './Card';
 
 const Contacs = ({item}) => {
-
+  const linkAPI = 'http://192.168.1.37:5000/';
 
   return (
       <Card style={Styles.card}>
         <View style={Styles.content}>
-          <Feather
-          style={Styles.imageNoPict}
-          name="user" size={40} color="#6379F4"
-          />
+        { item.avatar === null ?
+                <Feather
+                style={Styles.imageNoPict}
+                name="user" size={40} color="#6379F4"
+                />
+                :
+                <Image
+                style={Styles.image}
+                source={{uri:linkAPI + item.avatar}}
+                />
+              }
           <View style={Styles.textContent}>
             <Text style={Styles.textName}>{item.username}</Text>
             <Text style={Styles.phone}>{item.phone}</Text>

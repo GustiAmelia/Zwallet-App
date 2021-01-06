@@ -1,11 +1,13 @@
-import React, {useState} from 'react';
-import { View, Text, StyleSheet, StatusBar, TextInput,TouchableOpacity,TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
+import React, {useState,useEffect} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import { View, Text, StyleSheet, StatusBar, TextInput,TouchableOpacity,TouchableWithoutFeedback, Keyboard, ScrollView, ActivityIndicator } from 'react-native';
 import {colors} from '../components/colors';
 import {Formik} from 'formik';
 import * as yup from 'yup';
 import {IconButton} from 'react-native-paper';
+import {loginCreator} from '../redux/actions/auth';
 
-const Login = () => {
+const Login = ({navigation}) => {
 
   const schema = yup.object({
     email:yup.string().required().email(),
@@ -16,6 +18,17 @@ const Login = () => {
   const handleSecureText = ()=>{
     setSecureTextEntry(!secureTextEntry);
   };
+
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state)=>state.auth.isLoading);
+  const data = useSelector((state)=>state.auth.data);
+  const [errorMessage,setErrorMesage] = useState('');
+
+  useEffect(()=>{
+    if (data === undefined){
+      setErrorMesage('Incorrect email or password!');
+    }
+  },[data]);
 
   return (
     <>
@@ -33,6 +46,7 @@ const Login = () => {
               }}
               onSubmit={(values,actions)=>{
                 actions.resetForm();
+                dispatch(loginCreator(values));
               }}
               validationSchema={schema}
             >
@@ -40,6 +54,7 @@ const Login = () => {
               <ScrollView style={styles.footerContent}>
                 <Text style={styles.titleFooter}>Login</Text>
                 <Text style={styles.textFooter}>Login to your existing account to access all the features in Zwallet.</Text>
+                <Text style={styles.errorMessage}>{errorMessage}</Text>
                 <View style={props.values.email ? styles.textWrapperFilled : styles.textWrapperBlank}>
                   <IconButton icon="email-outline" color={props.values.email ? colors.primary : colors.textDescription}/>
                   <TextInput
@@ -77,12 +92,18 @@ const Login = () => {
                   <Text style={styles.textForgot}>Forgot password?</Text>
                 </TouchableOpacity>
                 <View style={styles.buttonWrapper}>
-                  <TouchableOpacity onPress={props.handleSubmit} disabled={!props.values.email || !props.values.password} style={!props.values.email || !props.values.password ? styles.buttonBlank : styles.buttonFilled}>
-                    <Text style={!props.values.email || !props.values.password ? styles.textButtonBlank : styles.textButtonFilled}>Login</Text>
-                  </TouchableOpacity>
+                  {isLoading ?
+                    <View style={styles.buttonFilled}>
+                      <ActivityIndicator color="white" size={30} style={styles.textButtonFilled}/>
+                    </View>
+                    :
+                    <TouchableOpacity onPress={props.handleSubmit} disabled={!props.values.email || !props.values.password} style={!props.values.email || !props.values.password ? styles.buttonBlank : styles.buttonFilled}>
+                      <Text style={!props.values.email || !props.values.password ? styles.textButtonBlank : styles.textButtonFilled}>Login</Text>
+                    </TouchableOpacity>
+                  }
                   <View style={styles.questions}>
                     <Text style={styles.textQuestions}>Don’t have an account? Let’s </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={()=>navigation.navigate('SignUp')}>
                       <Text style={styles.link}>Sign Up</Text>
                     </TouchableOpacity>
                   </View>
@@ -229,6 +250,11 @@ const styles = StyleSheet.create({
     fontWeight:'bold',
     fontSize:16,
     lineHeight:23,
+  },
+  errorMessage:{
+    color:colors.error,
+    textAlign:'center',
+    fontSize:18,
   },
 });
 

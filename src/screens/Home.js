@@ -1,12 +1,20 @@
 import React, {useState} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import { View, Text, StyleSheet, StatusBar,TouchableOpacity,Image,FlatList } from 'react-native';
 import {colors} from '../components/colors';
 import Feather from 'react-native-vector-icons/Feather';
 import Transaction from '../components/Transaction';
 
-const Home = () => {
+const Home = ({navigation}) => {
 
-  const data = [
+  const authData = useSelector((state)=>state.auth.data);
+  const data = useSelector((state)=>state.user.user);
+
+  const userLogin = data.filter((item)=>{return item.id === authData.id;});
+  const linkAPI = 'http://192.168.1.37:5000/';
+
+
+  const a = [
     {name:'Suga', total:1000},
     {name:'yongi', total:15000},
     {name:'jimin', total:12000},
@@ -20,13 +28,20 @@ const Home = () => {
           <View style={styles.contentHeader}>
             <TouchableOpacity
               style={styles.leftContent}>
-              <Feather
-              style={styles.imageNoPict}
-              name="user" size={40} color="#6379F4"
-              />
+              {userLogin[0].avatar === null ?
+                <Feather
+                style={styles.imageNoPict}
+                name="user" size={40} color="#6379F4"
+                />
+                :
+                <Image
+                style={styles.image}
+                source={{uri:linkAPI + userLogin[0].avatar}}
+                />
+              }
               <View style={styles.textLeftContent}>
                 <Text style={styles.textHeader}>Balance</Text>
-                <Text style={styles.nominalHeader}>{(100).toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
+                <Text style={styles.nominalHeader}>{userLogin[0].balance.toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.rightContent}>
@@ -38,7 +53,9 @@ const Home = () => {
         </View>
         <View style={styles.footer}>
           <View style={styles.button}>
-            <TouchableOpacity >
+            <TouchableOpacity
+            onPress={()=>navigation.navigate('Search')}
+            >
               <Text style={styles.textButton}><Feather
                 name="arrow-up" size={25} color="#608DE2"
               />  Transfer</Text>
@@ -56,7 +73,7 @@ const Home = () => {
             </TouchableOpacity>
           </View>
           <FlatList
-            data={data}
+            data={a}
             renderItem={({item})=>{
               return (
                 <Transaction item={item}/>

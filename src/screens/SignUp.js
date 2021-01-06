@@ -1,13 +1,16 @@
 import React, {useState} from 'react';
-import { View, Text, StyleSheet, StatusBar, TextInput,TouchableOpacity,TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
+import { View, Text, StyleSheet, StatusBar, TextInput,TouchableOpacity,TouchableWithoutFeedback, Keyboard, ScrollView, ActivityIndicator} from 'react-native';
 import {colors} from '../components/colors';
 import {Formik} from 'formik';
 import * as yup from 'yup';
 import {IconButton} from 'react-native-paper';
+import {registerCreator} from '../redux/actions/auth';
 
-const SignUp = () => {
+const SignUp = ({navigation}) => {
 
   const schema = yup.object({
+    username:yup.string().required(),
     email:yup.string().required().email(),
     password:yup.string().required(),
   });
@@ -16,6 +19,9 @@ const SignUp = () => {
   const handleSecureText = ()=>{
     setSecureTextEntry(!secureTextEntry);
   };
+
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state)=>state.auth.isLoading);
 
   return (
     <>
@@ -34,7 +40,7 @@ const SignUp = () => {
               }}
               onSubmit={(values,actions)=>{
                 actions.resetForm();
-                console.log(values)
+                dispatch(registerCreator(values));
               }}
               validationSchema={schema}
             >
@@ -52,7 +58,7 @@ const SignUp = () => {
                     onBlur={props.handleBlur('username')}
                   />
                 </View>
-                <Text style={styles.isValidInput}>{props.touched.email && props.errors.email}</Text>
+                <Text style={styles.isValidInput}>{props.touched.username && props.errors.username}</Text>
                 <View style={props.values.email ? styles.textWrapperFilled : styles.textWrapperBlank}>
                   <IconButton icon="email-outline" color={props.values.email ? colors.primary : colors.textDescription}/>
                   <TextInput
@@ -87,12 +93,18 @@ const SignUp = () => {
                 </View>
                 <Text style={styles.isValidInput}>{props.touched.password && props.errors.password}</Text>
                 <View style={styles.buttonWrapper}>
-                  <TouchableOpacity onPress={props.handleSubmit} disabled={!props.values.email || !props.values.password} style={!props.values.email || !props.values.password ? styles.buttonBlank : styles.buttonFilled}>
-                    <Text style={!props.values.email || !props.values.password ? styles.textButtonBlank : styles.textButtonFilled}>Sign Up</Text>
-                  </TouchableOpacity>
+                  {isLoading ?
+                    <View style={styles.buttonFilled}>
+                      <ActivityIndicator color="white" size={30} style={styles.textButtonFilled}/>
+                    </View>
+                    :
+                    <TouchableOpacity onPress={props.handleSubmit} disabled={!props.values.email || !props.values.password} style={!props.values.email || !props.values.password ? styles.buttonBlank : styles.buttonFilled}>
+                      <Text style={!props.values.email || !props.values.password ? styles.textButtonBlank : styles.textButtonFilled}>Sign Up</Text>
+                    </TouchableOpacity>
+                  }
                   <View style={styles.questions}>
                     <Text style={styles.textQuestions}>Already have an account? Let’s </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={()=>navigation.navigate('Login')}>
                       <Text style={styles.link}>Login</Text>
                     </TouchableOpacity>
                   </View>

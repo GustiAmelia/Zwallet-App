@@ -1,9 +1,25 @@
-import React, {useState} from 'react';
-import { View, Text, StyleSheet, StatusBar,TouchableOpacity } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import { View, Text, StyleSheet, StatusBar,TouchableOpacity,ActivityIndicator } from 'react-native';
 import {colors} from '../components/colors';
 import {IconButton} from 'react-native-paper';
+import {loginCreator} from '../redux/actions/auth';
+import {getUserCreator} from '../redux/actions/user';
 
 const PinSuccess = () => {
+
+  const dispatch = useDispatch();
+  const credential = useSelector((state)=>state.auth.data);
+
+  const buttonLogin = ()=>{
+    dispatch(loginCreator(credential));
+  };
+
+  useEffect(()=>{
+    dispatch(getUserCreator());
+  },[]);
+
+  const isLoading = useSelector((state)=>state.auth.isLoading);
 
   return (
     <>
@@ -18,9 +34,16 @@ const PinSuccess = () => {
             <Text style={styles.titleFooter}>PIN Successfully Created</Text>
             <Text style={styles.textFooter}>Your PIN was successfully created and you can now access all the features in Zwallet. Login to your new account and start exploring!</Text>
             <View style={styles.buttonWrapper}>
-              <TouchableOpacity   style={styles.button}>
-                <Text style={styles.textButton}>Login Now</Text>
-              </TouchableOpacity>
+              {isLoading ?
+                <View style={styles.button}>
+                  <ActivityIndicator color="white" size={30} style={styles.textButton}/>
+                </View>
+                :
+                <TouchableOpacity style={styles.button}
+                  onPress={buttonLogin}>
+                  <Text style={styles.textButton}>Login Now</Text>
+                </TouchableOpacity>
+              }
             </View>
           </View>
         </View>
