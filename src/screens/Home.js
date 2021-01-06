@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState,useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import { View, Text, StyleSheet, StatusBar,TouchableOpacity,Image,FlatList } from 'react-native';
 import {colors} from '../components/colors';
 import Feather from 'react-native-vector-icons/Feather';
 import Transaction from '../components/Transaction';
+import {historyCreator} from '../redux/actions/transaction';
 
 const Home = ({navigation}) => {
 
@@ -13,12 +14,13 @@ const Home = ({navigation}) => {
   const userLogin = data.filter((item)=>{return item.id === authData.id;});
   const linkAPI = 'http://192.168.1.37:5000/';
 
+  const dispatch = useDispatch();
 
-  const a = [
-    {name:'Suga', total:1000},
-    {name:'yongi', total:15000},
-    {name:'jimin', total:12000},
-]
+  useEffect(()=>{
+    dispatch(historyCreator(authData.id));
+  },[]);
+
+  const history = useSelector((state)=>state.transaction.homeHistory);
 
   return (
     <>
@@ -73,7 +75,7 @@ const Home = ({navigation}) => {
             </TouchableOpacity>
           </View>
           <FlatList
-            data={a}
+            data={history}
             renderItem={({item})=>{
               return (
                 <Transaction item={item}/>

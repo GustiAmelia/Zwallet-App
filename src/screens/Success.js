@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import { View, Text, StyleSheet, StatusBar,TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, StatusBar,TouchableOpacity, ScrollView, Image,Feather } from 'react-native';
 import {colors} from '../components/colors';
 import Card from '../components/Card';
 import {IconButton} from 'react-native-paper';
@@ -14,6 +14,7 @@ const Success = ({route,navigation}) => {
   let {form} = route.params;
 
   const dispatch = useDispatch();
+  const linkAPI = 'http://192.168.1.37:5000/';
 
   const buttonBackToHome = ()=>{
     dispatch(getUserCreator());
@@ -57,7 +58,17 @@ const Success = ({route,navigation}) => {
             </Card>
             <Text style={styles.text}>From</Text>
             <Card style={styles.cardContact}>
-              <Image source={require('../../assets/images/suga.jpg')} style={styles.image}/>
+              {user[0].avatar === null ?
+                <Feather
+                style={styles.imageNoPict}
+                name="user" size={40} color="#6379F4"
+                />
+                :
+                <Image
+                style={styles.image}
+                source={{uri:linkAPI + user[0].avatar}}
+                />
+              }
               <View style={styles.textContent}>
                 <Text style={styles.textName}>{user[0].username}</Text>
                 <Text style={styles.phone}>{user[0].phone}</Text>
@@ -65,7 +76,17 @@ const Success = ({route,navigation}) => {
             </Card>
             <Text style={styles.text}>To</Text>
             <Card style={styles.cardContact}>
-              <Image source={require('../../assets/images/suga.jpg')} style={styles.image}/>
+              {item.avatar === null ?
+                <Feather
+                style={styles.imageNoPict}
+                name="user" size={40} color="#6379F4"
+                />
+                :
+                <Image
+                style={styles.image}
+                source={{uri:linkAPI + item.avatar}}
+                />
+              }
               <View style={styles.textContent}>
                 <Text style={styles.textName}>{item.username}</Text>
                 <Text style={styles.phone}>{item.phone}</Text>
@@ -142,13 +163,13 @@ const styles = StyleSheet.create({
     marginVertical:10,
   },
   titleInfo:{
-    fontSize:16,
+    fontSize:15,
     lineHeight:22,
     color:'#7A7886',
-    marginBottom:10,
+    marginBottom:7,
   },
   info:{
-    fontSize:18,
+    fontSize:17,
     lineHeight:25,
     color:'#514F5B',
     fontWeight:'bold',

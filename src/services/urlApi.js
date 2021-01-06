@@ -21,3 +21,7 @@ export const getUser = ()=>{
   return Axios.get(`${linkAPI}user`);
 };
 
+export const allTransaction = (id)=>{
+  return Axios.get(`${linkAPI}transaction?sender_id=${id}&receiver_id=${id}`);
+};
+

@@ -36,17 +36,19 @@ const PinConfirmation = ({route,navigation}) => {
     }).catch(err => console.log(err));
   };
 
-  if (pinSuccess){
-    Axios.post(`${linkAPI}transaction`,{
-      category:'Transfer',
-      amount:form.amount,
-      sender_id:authData.id,
-      receiver_id:item.id,
-      note:form.note,
-    }).then((res) => {
-      setTransferSuccess(res.data.isSuccess);
-    }).catch(err => console.log(err));
-  }
+  useEffect(()=>{
+    if (pinSuccess){
+      Axios.post(`${linkAPI}transaction`,{
+        category:'Transfer',
+        amount:form.amount,
+        sender_id:authData.id,
+        receiver_id:item.id,
+        note:form.note,
+      }).then((res) => {
+        setTransferSuccess(res.data.isSuccess);
+      }).catch(err => console.log(err));
+    }
+  },[pinSuccess]);
 
   if (transferSuccess){
     navigation.navigate('Success',{...{item},form});

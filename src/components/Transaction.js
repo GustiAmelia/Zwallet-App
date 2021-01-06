@@ -1,24 +1,40 @@
 import React from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import { View, Text,Image, StyleSheet} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import Card from './Card';
 
 const Transaction = ({item}) => {
 
+  const authData = useSelector((state)=>state.auth.data);
+  const linkAPI = 'http://192.168.1.37:5000/';
+
   return (
     <Card style={Styles.card}>
       <View style={Styles.leftContent}>
-        <Feather
-        style={Styles.imageNoPict}
-        name="user" size={40} color="#6379F4"
-        />
+        {item.avatar === null ?
+          <Feather
+          style={Styles.imageNoPict}
+          name="user" size={40} color="#6379F4"
+          />
+          :
+          <Image
+          style={Styles.image}
+          source={{uri:linkAPI + item.avatar}}
+          />
+        }
         <View style={Styles.textLeftContent}>
-          <Text style={Styles.textName}>{item.name}</Text>
+          <Text style={Styles.textName}>{item.username}</Text>
           <Text style={Styles.description}>Transfer</Text>
         </View>
       </View>
       <View style={Styles.rightContent}>
-        <Text style={Styles.nominalOut}>{item.total.toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
+      {authData.id === item.receiver_id
+        ?
+        <Text style={Styles.nominalIn}>+{item.amount.toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
+        :
+        <Text style={Styles.nominalOut}>-{item.amount.toLocaleString('id',{style:'currency',currency:'IDR'})}</Text>
+        }
       </View>
     </Card>
   );
